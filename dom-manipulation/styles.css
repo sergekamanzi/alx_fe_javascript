@@ -1,0 +1,124 @@
+:root {
+  --bg: #0f172a;
+  --card: #111827;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --accent: #60a5fa;
+  --accent-2: #34d399;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  background: linear-gradient(180deg, #0b1020, #0f172a);
+  color: var(--text);
+}
+
+header, footer {
+  text-align: center;
+  padding: 1.25rem 1rem;
+  background: rgba(17,24,39,.6);
+  backdrop-filter: blur(6px);
+}
+
+main {
+  padding: 1.25rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+section {
+  background: rgba(17,24,39,.5);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,.3);
+}
+
+.controls {
+  display: grid;
+  gap: .75rem;
+  align-items: center;
+}
+.controls label { color: var(--muted); }
+
+#importFile, #exportQuotes, #categoryFilter, #quoteText, #quoteCategory, #quoteForm button {
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(31,41,55,.6);
+  color: var(--text);
+  padding: .6rem .8rem;
+}
+
+.import-export {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+#exportQuotes, #quoteForm button {
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+}
+#exportQuotes:hover, #quoteForm button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(96,165,250,.25);
+  background: rgba(31,41,55,.8);
+}
+
+.quotes ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: .6rem;
+}
+
+#quotesList li {
+  background: rgba(17,24,39,.65);
+  border: 1px solid rgba(255,255,255,.06);
+  padding: .9rem 1rem;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .75rem;
+  animation: fadeIn .35s ease;
+}
+
+.quote-text { line-height: 1.4; }
+.quote-meta {
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.badge {
+  color: #081018;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  padding: .2rem .5rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+}
+
+.empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 1rem;
+}
+
+.add-quote form {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+#quoteText { flex: 2 1 300px; }
+#quoteCategory { flex: 1 1 160px; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
