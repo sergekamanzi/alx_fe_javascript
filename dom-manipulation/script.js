@@ -1,170 +1,48 @@
-// ====================
-// DOM ELEMENTS
-// ====================
-const quoteDisplay = document.getElementById('quoteDisplay');
-const categoryFilter = document.getElementById('categoryFilter');
-const addQuoteForm = document.getElementById('addQuoteForm');
-const newQuoteText = document.getElementById('newQuoteText');
-const newQuoteAuthor = document.getElementById('newQuoteAuthor');
-const newQuoteCategory = document.getElementById('newQuoteCategory');
-
-// ====================
-// STATE
-// ====================
-let quotes = JSON.parse(localStorage.getItem('quotes')) || [
-    { text: "The best way to predict the future is to create it.", author: "Peter Drucker", category: "Motivation" },
-    { text: "Life is what happens when you're busy making other plans.", author: "John Lennon", category: "Life" }
+// Initial Quotes Data
+let quotes = [
+  { text: "The best way to get started is to quit talking and begin doing.", category: "Motivation" },
+  { text: "Don’t let yesterday take up too much of today.", category: "Life" },
+  { text: "It’s not whether you get knocked down, it’s whether you get up.", category: "Inspiration" }
 ];
 
-const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+// Get DOM Elements
+const quoteDisplay = document.getElementById("quoteDisplay");
+const newQuoteBtn = document.getElementById("newQuote");
+const addQuoteBtn = document.getElementById("addQuoteBtn");
+const newQuoteText = document.getElementById("newQuoteText");
+const newQuoteCategory = document.getElementById("newQuoteCategory");
 
-// ====================
-// INITIALIZE
-// ====================
-populateCategories();
-displayRandomQuote();
-syncQuotes();
-
-// ====================
-// EVENT LISTENERS
-// ====================
-addQuoteForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const text = newQuoteText.value.trim();
-    const author = newQuoteAuthor.value.trim() || "Unknown";
-    const category = newQuoteCategory.value.trim() || "General";
-
-    if (!text) return;
-
-    const newQuote = { text, author, category };
-    quotes.push(newQuote);
-    localStorage.setItem('quotes', JSON.stringify(quotes));
-    populateCategories();
-    displayRandomQuote();
-
-    newQuoteText.value = "";
-    newQuoteAuthor.value = "";
-    newQuoteCategory.value = "";
-
-    // Sync with server
-    syncQuotes(newQuote);
-});
-
-categoryFilter.addEventListener('change', () => {
-    localStorage.setItem('selectedCategory', categoryFilter.value);
-    displayRandomQuote();
-});
-
-// ====================
-// FUNCTIONS
-// ====================
-function displayRandomQuote() {
-    const selectedCategory = categoryFilter.value || localStorage.getItem('selectedCategory') || "all";
-    const filtered = selectedCategory === "all"
-        ? quotes
-        : quotes.filter(q => q.category === selectedCategory);
-
-    if (filtered.length === 0) {
-        quoteDisplay.textContent = "No quotes in this category.";
-        return;
-    }
-
-    const randomIndex = Math.floor(Math.random() * filtered.length);
-    const { text, author } = filtered[randomIndex];
-    quoteDisplay.textContent = `"${text}" - ${author}`;
+// Show Random Quote Function
+function showRandomQuote() {
+  if (quotes.length === 0) {
+    quoteDisplay.innerText = "No quotes available. Please add one!";
+    return;
+  }
+  const randomIndex = Math.floor(Math.random() * quotes.length);
+  const quote = quotes[randomIndex];
+  quoteDisplay.innerHTML = `"${quote.text}" <br><small>- Category: ${quote.category}</small>`;
 }
 
-function populateCategories() {
-    const categories = ["all", ...new Set(quotes.map(q => q.category))];
-    categoryFilter.innerHTML = categories
-        .map(cat => `<option value="${cat}">${cat}</option>`)
-        .join("");
-    categoryFilter.value = localStorage.getItem('selectedCategory') || "all";
+// Add Quote Function
+function addQuote() {
+  const text = newQuoteText.value.trim();
+  const category = newQuoteCategory.value.trim();
+
+  if (text === "" || category === "") {
+    alert("Please enter both a quote and a category!");
+    return;
+  }
+
+  // Add to quotes array
+  quotes.push({ text, category });
+
+  // Clear inputs
+  newQuoteText.value = "";
+  newQuoteCategory.value = "";
+
+  alert("New quote added successfully!");
 }
 
-// ====================
-// SYNC FUNCTION
-// ====================
-async function syncQuotes(newQuote = null) {
-    try {
-        // POST new quote if provided
-        if (newQuote) {
-            await fetch(SERVER_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newQuote)
-            });
-        }
-
-        // Fetch latest quotes from server
-        await fetchQuotesFromServer();
-
-    } catch (error) {
-        console.error("Error syncing quotes:", error);
-    }
-}
-
-// ====================
-// FETCH FROM SERVER
-// ====================
-// ====================
-// FETCH FROM SERVER
-// ====================
-async function fetchQuotesFromServer() {
-    try {
-        const res = await fetch(SERVER_URL);
-        const serverData = await res.json();
-
-        // Convert server data to quote format
-        const serverQuotes = serverData.slice(0, 5).map(post => ({
-            text: post.title,
-            author: `User ${post.userId}`,
-            category: "Server"
-        }));
-
-        // Conflict resolution: add only new quotes
-        let updated = false;
-        serverQuotes.forEach(sq => {
-            if (!quotes.some(lq => lq.text === sq.text)) {
-                quotes.push(sq);
-                updated = true;
-            }
-        });
-
-        if (updated) {
-            localStorage.setItem('quotes', JSON.stringify(quotes));
-            populateCategories();
-            displayRandomQuote();
-
-            // Alert user of sync
-            alert("Quotes synced with server!");
-        }
-
-    } catch (error) {
-        console.error("Error fetching server quotes:", error);
-    }
-}
-
-
-// ====================
-// NOTIFICATION
-// ====================
-function notifyUser(message) {
-    const notification = document.createElement("div");
-    notification.textContent = message;
-    notification.style.position = "fixed";
-    notification.style.bottom = "10px";
-    notification.style.right = "10px";
-    notification.style.background = "#222";
-    notification.style.color = "#fff";
-    notification.style.padding = "10px";
-    notification.style.borderRadius = "5px";
-    document.body.appendChild(notification);
-
-    setTimeout(() => notification.remove(), 3000);
-}
-
-// ====================
-// AUTO SYNC EVERY 15s
-// ====================
-setInterval(fetchQuotesFromServer, 15000);
+// Event Listeners
+newQuoteBtn.addEventListener("click", showRandomQuote);
+addQuoteBtn.addEventListener("click", addQuote);
